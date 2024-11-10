@@ -42,7 +42,7 @@ ansible-galaxy collection install -r requirements.yml
 ### Переменные
 Все настройки вынесены в групповые переменные
 ### Реквизиты доступа
-Перед установкой следует сгенерировать необходимые пароли доступа к БД и GUI Semaphore
+Перед установкой следует сгенерировать необходимые пароли доступа к БД и GUI Semaphore. Файл `pg_pass` должен быть исполняемым.
 
 ```bash
 ansible-vault encrypt_string --vault-id postgres@pg_pass
