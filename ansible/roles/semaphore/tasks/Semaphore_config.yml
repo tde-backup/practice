@@ -1,0 +1,26 @@
+---
+
+- name: Generate Semaphore configuration file in JSON format
+  template:
+    src: semaphore_config.json.j2
+    dest: /opt/semaphore/config.json
+    owner: semaphore
+    group: semaphore
+    mode: '0644'
+
+- name: Ensure /etc/semaphore directory exists
+  file:
+    path: /etc/semaphore
+    state: directory
+    owner: semaphore
+    group: semaphore
+    mode: '0755'
+
+- name: Create symbolic link to config.json in /etc/semaphore
+  file:
+    src: /opt/semaphore/config.json
+    dest: /etc/semaphore/config.json
+    state: link
+    owner: semaphore
+    group: semaphore
+    mode: '0644'

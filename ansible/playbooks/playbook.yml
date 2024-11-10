@@ -1,0 +1,98 @@
+---
+
+- name: 'Install PostgreSQL'
+  hosts: postgres
+  become: true
+
+  vars:
+    postgres_users_no_log: "{{ pg_sql.no_log }}"
+    postgresql_users:
+    - name: "{{ pg_sql.name }}"
+      password: "{{ pg_sql.password }}"
+      postgres_master_ip: "{{ ansible_host }}"
+      postgresql_restarted_state: "restarted"
+      postgresql_locales:
+        - 'en_US.UTF-8'
+        - 'ru_RU.UTF8'
+
+      postgresql_users:
+        - name: "{{ semaphore.user }}"
+          password: "{{ semaphore.password }}" 
+          login_password: "{{ pg_sql.password }}"
+          login_user: "{{ pg_sql.name }}"
+          state: 'present'
+
+      postgresql_databases:
+        - name: "{{ semaphore.db }}"
+          login_password: "{{ pg_sql.password }}"
+          login_user: "{{ pg_sql.name }}"
+          owner: "{{ semaphore.user }}" # defaults to postgresql_user
+          state: 'present'
+
+  roles:
+    - role: geerlingguy.postgresql
+      tags:
+        - postgres
+
+  tasks:
+
+    - name: "Ensure PostgreSQL user {{ semaphore.user }} is present"
+      postgresql_user:
+        name: "{{ semaphore.user }}"
+        password: "{{ semaphore.password }}"
+        login_password: "{{ pg_sql.password }}"
+        login_user: "{{ pg_sql.name }}"
+      no_log: "{{ pg_sql.no_log }}"
+      become: true
+      become_user: "{{ pg_sql.name }}"
+      tags:
+        - postgres
+    
+    - name: "Ensure PostgreSQL database {{ semaphore.db }} is present"
+      postgresql_db:
+        name: "{{ semaphore.db }}"
+        login_password: "{{ pg_sql.password }}"
+        login_user: "{{ pg_sql.name }}"
+        owner: "{{ semaphore.user }}"
+        state: 'present'
+      become: true
+      become_user: "{{ pg_sql.name }}"
+      tags:
+        - postgres
+    
+    - name: "Grant all privileges on {{ semaphore.db }} to semaphore user"
+      community.postgresql.postgresql_privs:
+        db: "{{ semaphore.db }}"
+        roles: "{{ semaphore.user }}"
+        type: database
+        privs: ALL
+        login_password: "{{ pg_sql.password }}"
+        login_user: "{{ pg_sql.name }}"
+      become: true
+      become_user: "{{ pg_sql.name }}"
+      tags:
+        - postgres
+    
+    - name: "Healthcheck after PostgreSQL config"
+      postgresql_query:
+        db: postgres
+        login_user: "{{ pg_sql.name }}"
+        login_password: "{{ pg_sql.password }}"
+        query: SELECT version()
+      become: true
+      become_user: "{{ pg_sql.name }}"
+      tags:
+        - postgres
+
+    - name: "Update pg_hba.conf: locals"
+      lineinfile:
+        path: "{{ postgresql_config_path }}/pg_hba.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: "local all postgres    peer."
+          line:   "local   all postgres                               md5"
+        - regexp: "local all all    peer"
+          line:   "local   all all                                    md5"
+      tags:
+        - postgres

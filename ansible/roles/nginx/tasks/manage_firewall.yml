@@ -1,0 +1,28 @@
+---
+
+- name: Open HTTP/HTTPS ports
+  ansible.builtin.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+  loop:
+    - http
+    - https
+  notify:
+    - "Reload Firewall"
+    - "Restart NGINX"
+
+- name: "Ensure httpd_can_network_connect is to 1"
+  ansible.builtin.command: "getsebool httpd_can_network_connect"
+  register: selinux_bool_status
+
+- name: "Manage firewall: Show selinux status"
+  debug:
+    var: selinux_bool_status.stdout
+
+- name: "Switch on httpd_can_network_connect if not yet"
+  ansible.builtin.command: "setsebool -P httpd_can_network_connect 1"
+  become: yes
+  notify:
+  - "Restart NGINX"
+  when: "'off' in selinux_bool_status.stdout"

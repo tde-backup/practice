@@ -1,0 +1,17 @@
+---
+# handlers file for nginx
+- name: "Restart NGINX"
+  ansible.builtin.service:
+    name: "nginx"
+    enabled: true
+    state: "started"
+
+# - name: "Reload Firewall"
+#   ansible.builtin.firewalld:
+#     immediate: yes
+#     permanent: true
+#     state: enabled
+
+- name: "Reload Firewall"
+  ansible.builtin.command: "firewall-cmd --reload"
+  become: yes

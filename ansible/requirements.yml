@@ -1,0 +1,7 @@
+---
+roles:
+- src: geerlingguy.postgresql
+
+collections:
+- name: community.postgresql
+- name: community.crypto

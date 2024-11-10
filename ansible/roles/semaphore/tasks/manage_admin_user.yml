@@ -1,0 +1,31 @@
+---
+# tasks file for Manage admin user
+
+- name: "Manage admin user: Ensure the admin user exists {{ semaphore_admin.login }}"
+  community.postgresql.postgresql_query:
+    db: "{{ semaphore.db }}"
+    login_user: "{{ pg_sql.name }}"
+    login_password: "{{ pg_sql.password }}"
+    query: SELECT * FROM public.user WHERE username = %s
+    positional_args:
+      - '{{ semaphore_admin.login }}'
+  register: admin_user_exist
+
+- name: "Manage admin user: Show user"
+  debug:
+    var: admin_user_exist
+
+- name: "Manage admin user: Add administrator"
+  ansible.builtin.command: |
+    semaphore user add --admin --login {{ semaphore_admin.login }} --name {{ semaphore_admin.name }} --email {{ semaphore_admin.email }} --password {{ semaphore_admin.password }} --config /etc/semaphore/config.json
+  register: admin_login_status
+  failed_when: admin_login_status.rc != 0
+  # We expect to see the response something like that,
+  # but we don't know ahead what names will appear here
+  # 'User admin <admin@localhost.local> added!'
+  changed_when: "'> added!' in admin_login_status.stdout"
+  when: admin_user_exist.rowcount == 0
+
+- name: "Manage admin user: Show admin login"
+  debug:
+    var: admin_login_status.stdout

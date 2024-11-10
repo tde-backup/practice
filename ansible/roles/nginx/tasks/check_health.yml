@@ -1,0 +1,25 @@
+---
+
+- name: "Check the http service accessability"
+  ansible.builtin.command: "sh -c 'ss -tln | grep 80'"
+  register: http_access_status
+  failed_when: http_access_status.rc not in [0, 1]
+
+- name: "Check health: HTTP accessability status"
+  debug:
+    var: http_access_status.stdout
+  notify:
+  - "Restart NGINX"
+  when: http_access_status.rc == 1
+
+- name: "Check the https service accessability"
+  ansible.builtin.command: "sh -c 'ss -tln | grep 443'"
+  register: https_access_status
+  failed_when: https_access_status.rc not in [0, 1]
+
+- name: "Check health: HTTPS accessibility status"
+  debug:
+    var: https_access_status.stdout
+  notify:
+    - "Restart NGINX"
+  when: https_access_status.rc == 1

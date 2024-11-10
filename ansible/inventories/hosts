@@ -1,0 +1,30 @@
+---
+all:
+  children:
+    servers:
+      children:
+        debian:
+          hosts:
+            controlnode:
+              ansible_host: localhost
+              ansible_connection: local
+        redhat:
+          children:
+            rocky:
+              hosts:
+                pg_srv:
+                  ansible_host: 192.168.50.11
+                smphr_srv:
+                  ansible_host: 192.168.50.12
+    semaphore:
+      children:
+        postgres:
+          hosts:
+            pg_srv: {}
+            smphr_srv: {}
+        front:
+          hosts:
+            smphr_srv: {}
+    ansible_ctrl:
+      hosts:
+        controlnode: {}

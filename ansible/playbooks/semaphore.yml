@@ -1,0 +1,11 @@
+---
+- name: 'Install Semaphore'
+  hosts: front
+  become: true
+
+  roles:
+    - role: semaphore
+      tag: semaphore
+    - role: nginx
+      tag: nginx
+

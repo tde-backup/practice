@@ -1,0 +1,25 @@
+[req]
+default_bits       = 2048
+prompt      = no
+default_keyfile    = localhost.key
+distinguished_name = dn
+req_extensions     = req_ext
+x509_extensions    = v3_ca
+
+[ dn ]
+C = RU
+ST = RU
+L = Russia
+O = localhost
+OU = Development
+CN = localhost
+
+[req_ext]
+subjectAltName = @alt_names
+
+[v3_ca]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1   = localhost
+DNS.2   = 127.0.0.1

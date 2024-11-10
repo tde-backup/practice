@@ -1,0 +1,27 @@
+---
+# tasks file for semaphore
+- name: Create semaphore user
+  user:
+    name: semaphore
+    create_home: yes
+    home: /opt/semaphore
+    shell: /usr/sbin/nologin
+
+- name: Install Semaphore
+  dnf:
+    name: https://github.com/ansible-semaphore/semaphore/releases/download/v2.8.77/semaphore_2.8.77_linux_amd64.rpm
+    update_cache: true
+    disable_gpg_check: yes
+    state: present
+
+- name: "Setup steps: Generate Semaphore configuration file"
+  ansible.builtin.include_tasks: 
+    Semaphore_config.yml
+
+- name: "Setup steps: Generate Semaphore Service System Unit"
+  ansible.builtin.include_tasks: 
+    semaphore_service.yml
+
+- name: "Setup steps: Generate Admin user if not exists"
+  ansible.builtin.include_tasks: 
+    manage_admin_user.yml

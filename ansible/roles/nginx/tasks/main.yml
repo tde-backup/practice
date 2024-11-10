@@ -1,0 +1,28 @@
+---
+
+- name: "Nginx:: Install Nginx Web Server if RedHat Family"
+  ansible.builtin.yum:
+    name: "nginx"
+    state: "latest"
+
+- name: "Nginx:: Start nginx"
+  ansible.builtin.service:
+    name: "nginx"
+    enabled: true
+    state: "started"
+
+- name: "Generate Selfsigned SSL certificate"
+  ansible.builtin.include_tasks:
+    ssl_certificates.yml
+
+- name: "Configure Semaphore Service"
+  ansible.builtin.include_tasks:
+    semaphore_service.yml
+
+- name: "Manage Firewall Settings"
+  ansible.builtin.include_tasks:
+    manage_firewall.yml
+
+- name: "Check health: HTTP/HTTPS accessibility status"
+  ansible.builtin.include_tasks:
+    check_health.yml

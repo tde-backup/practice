@@ -1,0 +1,45 @@
+---
+
+- name: Ensure /etc/nginx/ssl directory exists
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Generate private key on control node
+  community.crypto.openssl_privatekey:
+    path: /tmp/localhost.key
+    type: RSA
+    size: 2048
+  delegate_to: localhost
+
+- name: Generate self-signed certificate and key on control node
+  community.crypto.x509_certificate:
+    path: /tmp/localhost.crt
+    privatekey_path: /tmp/localhost.key
+    provider: selfsigned
+  delegate_to: localhost
+
+- name: Create target directory for SSL certificate
+  ansible.builtin.file:
+    path: /etc/nginx/ssl
+    state: directory
+    mode: '0755'
+
+- name: Copy certificate to target node
+  ansible.builtin.copy:
+    src: /tmp/localhost.crt
+    dest: /etc/nginx/ssl/localhost.crt
+    mode: '0644'
+  notify:
+    - "Restart NGINX"
+
+- name: Copy private key to target node
+  ansible.builtin.copy:
+    src: /tmp/localhost.key
+    dest: /etc/nginx/ssl/localhost.key
+    mode: '0600'
+  notify:
+    - "Restart NGINX"
