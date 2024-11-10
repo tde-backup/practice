@@ -12,8 +12,6 @@ all:
           children:
             rocky:
               hosts:
-                pg_srv:
-                  ansible_host: 192.168.50.11
                 smphr_srv:
                   ansible_host: 192.168.50.12
     semaphore:

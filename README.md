@@ -22,7 +22,7 @@
 1. Установка и настройка PostgreSQL и базы данных
 2. Развертывание сервиса Semaphore и Nginx
 ### Prerequisites
-1. В качестве рабочей ОС используется **"Rocky Linux 9.4 (Blue Onyx)"** под управлением **Vagrant** в среде **VirtualBox**. Использовался вполне дружелюбный образ **[generic/rocky9](https://portal.cloud.hashicorp.com/vagrant/discover/generic/rocky9)**
+1. В качестве контрол-ноды используется ВМ под управлением **"Ubuntu 20.04.6 LTS"** развернутой из образа **"ubuntu/focal64"** В качестве рабочей ОС используется **"Rocky Linux 9.4 (Blue Onyx)"** под управлением **Vagrant** в среде **VirtualBox**. Использовался вполне дружелюбный образ **[generic/rocky9](https://portal.cloud.hashicorp.com/vagrant/discover/generic/rocky9)**
 2. В процессе работы используются дополнительные роли и коллекции:
 ```yaml
 roles:

@@ -29,22 +29,6 @@ Vagrant.configure("2") do |config|
       SHELL
     end
   
-    config.vm.define "pg_srv" do |pg_srv|
-      pg_srv.vm.box = "generic/rocky9"
-      pg_srv.vm.hostname = "pg-srv"
-      pg_srv.vm.network "private_network", ip: "192.168.50.11"
-      pg_srv.vm.provision "shell", inline: <<-SHELL
-        sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/#g' /etc/ssh/sshd_config
-        service ssh restart
-  
-        chmod 644 /home/vagrant/.ssh/vagrant_test.pub
-        cat /home/vagrant/.ssh/vagrant_test.pub >> /home/vagrant/.ssh/authorized_keys
-  
-        sudo timedatectl set-timezone 'Europe/Kaliningrad'
-  
-      SHELL
-    end
-  
     config.vm.define "smphr_srv" do |smphr_srv|
       smphr_srv.vm.box = "generic/rocky9"
       smphr_srv.vm.hostname = "smphr-srv"
